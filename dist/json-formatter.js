@@ -1,7 +1,7 @@
 /*!
  * jsonformatter
  * 
- * Version: 0.4.1 - 2015-12-03T03:38:59.925Z
+ * Version: 0.4.2 - 2015-12-06T21:02:32.963Z
  * License: MIT
  */
 
@@ -144,6 +144,13 @@ angular.module('jsonFormatter', ['RecursionHelper'])
       if (scope.json.indexOf('http') === 0) {
         scope.isUrl = true;
       }
+      
+      // Add custom type for Buttons
+      if (scope.json.indexOf('button:') === 0) {
+        var buttonLabel = scope.json.split(':')[1];
+        // button:<button label>:<event name>:<event parameter>
+        scope.isButton = buttonLabel;          
+      }
     }
 
     scope.isEmptyObject = function () {
@@ -167,6 +174,17 @@ angular.module('jsonFormatter', ['RecursionHelper'])
     scope.openLink = function (isUrl) {
       if(isUrl) {
         window.location.href = scope.json;
+      }
+    };
+
+    scope.buttonClick = function (isButton) {     // Buttons
+      // button:<button label>:<event name>:event parameter
+      if(isButton) {
+        var eventName = scope.json.split(':');     // [button,label,event,param]
+        var param = eventName[3];                  // param
+        eventName = eventName[2];
+                
+        scope.$emit(eventName, param);
       }
     };
 
@@ -229,6 +247,7 @@ angular.module('jsonFormatter', ['RecursionHelper'])
 if (typeof module === 'object') {
   module.exports = 'jsonFormatter';
 }
+
 'use strict';
 
 // from http://stackoverflow.com/a/18609594
@@ -275,4 +294,4 @@ angular.module('RecursionHelper', []).factory('RecursionHelper', ['$compile', fu
   };
 }]);
 
-angular.module("jsonFormatter").run(["$templateCache", function($templateCache) {$templateCache.put("json-formatter.html","<div ng-init=\"isOpen = open && open > 0\" class=\"json-formatter-row\"><a ng-click=\"toggleOpen()\"><span class=\"toggler {{isOpen ? \'open\' : \'\'}}\" ng-if=\"isObject()\"></span> <span class=\"key\" ng-if=\"hasKey\"><span class=\"key-text\">{{key}}</span><span class=\"colon\">:</span></span> <span class=\"value\"><span ng-if=\"isObject()\"><span class=\"constructor-name\">{{getConstructorName(json)}}</span> <span ng-if=\"isArray()\"><span class=\"bracket\">[</span><span class=\"number\">{{json.length}}</span><span class=\"bracket\">]</span></span></span> <span ng-if=\"!isObject()\" ng-click=\"openLink(isUrl)\" class=\"{{type}}\" ng-class=\"{date: isDate, url: isUrl}\">{{parseValue(json)}}</span></span> <span ng-if=\"showThumbnail()\" class=\"thumbnail-text\">{{getThumbnail()}}</span></a><div class=\"children\" ng-if=\"getKeys().length && isOpen\"><json-formatter ng-repeat=\"key in getKeys() track by $index\" json=\"json[key]\" key=\"key\" open=\"childrenOpen()\"></json-formatter></div><div class=\"children empty object\" ng-if=\"isEmptyObject()\"></div><div class=\"children empty array\" ng-if=\"getKeys() && !getKeys().length && isOpen && isArray()\"></div></div>");}]);
+angular.module("jsonFormatter").run(["$templateCache", function($templateCache) {$templateCache.put("json-formatter.html","<div ng-init=\"isOpen = open && open > 0\" class=\"json-formatter-row\"><a ng-click=\"toggleOpen()\"><span class=\"toggler {{isOpen ? \'open\' : \'\'}}\" ng-if=\"isObject()\"></span> <span class=\"key\" ng-if=\"hasKey\"><span class=\"key-text\">{{key}}</span><span class=\"colon\">:</span></span> <span class=\"value\"><span ng-if=\"isObject()\"><span class=\"constructor-name\">{{getConstructorName(json)}}</span> <span ng-if=\"isArray()\"><span class=\"bracket\">[</span><span class=\"number\">{{json.length}}</span><span class=\"bracket\">]</span></span></span> <span ng-if=\"!isObject() && !isButton\" ng-click=\"openLink(isUrl)\" class=\"{{type}}\" ng-class=\"{date: isDate, url: isUrl}\">{{parseValue(json)}}</span><span ng-if=\"!isObject() && isButton\" class=\"{{type}}\" ng-class=\"{button: isButton}\"><button ng-click=\"buttonClick(isButton)\">{{isButton}}</button></span></span> <span ng-if=\"showThumbnail()\" class=\"thumbnail-text\">{{getThumbnail()}}</span></a><div class=\"children\" ng-if=\"getKeys().length && isOpen\"><json-formatter ng-repeat=\"key in getKeys() track by $index\" json=\"json[key]\" key=\"key\" open=\"childrenOpen()\"></json-formatter></div><div class=\"children empty object\" ng-if=\"isEmptyObject()\"></div><div class=\"children empty array\" ng-if=\"getKeys() && !getKeys().length && isOpen && isArray()\"></div></div>");}]);
