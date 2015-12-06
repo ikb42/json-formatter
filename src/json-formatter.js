@@ -137,11 +137,11 @@ angular.module('jsonFormatter', ['RecursionHelper'])
         scope.isUrl = true;
       }
       
-      // Add custom type for Buttons
-      if (scope.json.indexOf('button:') === 0) {
-        var buttonLabel = scope.json.split(':')[1];
-        // button:<button label>:<event name>:<event parameter>
-        scope.isButton = buttonLabel;          
+      // Add custom type for Button
+      if (scope.json.indexOf('buttons:') === 0) {
+        // buttons:[{label,event,param},{...}]
+        var buttons = JSON.parse(scope.json.substr(8));
+        scope.isButton = buttons;          
       }
     }
 
@@ -169,14 +169,11 @@ angular.module('jsonFormatter', ['RecursionHelper'])
       }
     };
 
-    scope.buttonClick = function (isButton) {     // Buttons
-      // button:<button label>:<event name>:event parameter
-      if(isButton) {
-        var eventName = scope.json.split(':');     // [button,label,event,param]
-        var param = eventName[3];                  // param
-        eventName = eventName[2];
-                
-        scope.$emit(eventName, param);
+    scope.buttonClick = function (button) {        // Buttons
+      // buttons:[{label,event name,event parameter,...]
+      if(button) {
+        if (button.showVariable) scope[button.showVariable] = !scope[button.showVariable];
+        scope.$emit(button.event, button.param);
       }
     };
 

@@ -10,8 +10,10 @@
       <span ng-if="!isObject() && !isButton" ng-click="openLink(isUrl)" class="{{type}}" ng-class="{date: isDate, url: isUrl}">{{parseValue(json)}}</span>
       
       <!-- Buttons -->
-      <span ng-if="!isObject() && isButton" class="{{type}}" ng-class="{button: isButton}">
-          <button ng-click="buttonClick(isButton)">{{isButton}}</button>
+      <span ng-if="!isObject() && isButton" class="{{type}}">
+          <span ng-repeat="button in isButton">
+            <button ng-click="buttonClick(button)" ng-show="button.show">{{button.label}}</button>
+          </span>
       </span>
       
     </span>
