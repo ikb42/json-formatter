@@ -136,6 +136,13 @@ angular.module('jsonFormatter', ['RecursionHelper'])
       if (scope.json.indexOf('http') === 0) {
         scope.isUrl = true;
       }
+      
+      // Add custom type for Buttons
+      if (scope.json.indexOf('button:') === 0) {
+        var buttonLabel = scope.json.split(':')[1];
+        // button:<button label>:<event name>:<event parameter>
+        scope.isButton = buttonLabel;          
+      }
     }
 
     scope.isEmptyObject = function () {
@@ -159,6 +166,17 @@ angular.module('jsonFormatter', ['RecursionHelper'])
     scope.openLink = function (isUrl) {
       if(isUrl) {
         window.location.href = scope.json;
+      }
+    };
+
+    scope.buttonClick = function (isButton) {     // Buttons
+      // button:<button label>:<event name>:event parameter
+      if(isButton) {
+        var eventName = scope.json.split(':');     // [button,label,event,param]
+        var param = eventName[3];                  // param
+        eventName = eventName[2];
+                
+        scope.$emit(eventName, param);
       }
     };
 
