@@ -11,8 +11,8 @@
       
       <!-- Buttons -->
       <span ng-if="!isObject() && isButton" class="{{type}}">
-          <span ng-repeat="button in isButton">
-            <button ng-click="buttonClick(button)" ng-show="button.show">{{button.label}}</button>
+          <span ng-repeat="button in isButton" ng-class="{button: isButton}">
+            <button ng-click="buttonClick(button)" ng-class="button.classes" ng-show="{{true || button.show}}">{{button.label}}</button>
           </span>
       </span>
       
