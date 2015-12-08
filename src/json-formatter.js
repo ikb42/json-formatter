@@ -139,9 +139,18 @@ angular.module('jsonFormatter', ['RecursionHelper'])
       
       // Add custom type for Button
       if (scope.json.indexOf('buttons:') === 0) {
-        // buttons:[{label,event,param},{...}]
+        // buttons:[{label,event,param,<classes>,<regEvent>,<regEventFn>},{...}]
         var buttons = JSON.parse(scope.json.substr(8));
-        scope.isButton = buttons;          
+        scope.isButton = buttons;
+        
+        buttons.forEach(function(button) {
+            if (button.regEvent) {
+                scope.$on(button.regEvent, function(event, params) {
+                    var fn = eval("(" + button.regEventFn + ")");
+                    fn();
+                });
+            }
+        });
       }
     }
 
@@ -170,7 +179,7 @@ angular.module('jsonFormatter', ['RecursionHelper'])
     };
 
     scope.buttonClick = function (button) {        // Buttons
-      // buttons:[{label,event name,event parameter,...]
+      // buttons:[{label,event,param,<classes>,<regEvent>,<regEventFn>},{...}]
       if(button) {
         if (button.showVariable) scope[button.showVariable] = !scope[button.showVariable];
         scope.$emit(button.event, button.param);
